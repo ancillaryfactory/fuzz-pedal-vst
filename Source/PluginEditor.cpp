@@ -21,8 +21,8 @@ FuzzPedalAudioProcessorEditor::FuzzPedalAudioProcessorEditor (FuzzPedalAudioProc
     gainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 100, 25);
     gainSlider.addListener(this);
     
-    gainSlider.setRange(0.0, 1.0);
-    gainSlider.setValue(0.5);
+    gainSlider.setRange(-48.0, 0.0);
+    gainSlider.setValue(-1.0);
     
     addAndMakeVisible(gainSlider);
 }
@@ -53,6 +53,7 @@ void FuzzPedalAudioProcessorEditor::sliderValueChanged(juce::Slider *slider)
 {
     if (slider == &gainSlider)
     {
-        audioProcessor.rawVolume = gainSlider.getValue();
+        // log scale for vol changes
+        audioProcessor.rawVolume = pow(10, gainSlider.getValue() / 20);
     }
 }
