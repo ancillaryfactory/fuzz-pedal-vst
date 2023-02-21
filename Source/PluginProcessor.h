@@ -9,6 +9,8 @@
 #pragma once
 
 #include <JuceHeader.h>
+#define GAIN_ID "gain"
+#define GAIN_NAME "Gain"
 
 //==============================================================================
 /**
@@ -57,9 +59,10 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
     
     double rawVolume;
+    //juce::AudioProcessorValueTreeState treeState;
 
 private:
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FuzzPedalAudioProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FuzzPedalAudioProcessor);
     
 };

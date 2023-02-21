@@ -20,8 +20,13 @@ FuzzPedalAudioProcessor::FuzzPedalAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        )
+                  // treeState(*this, nullptr)
 #endif
 {
+    /*
+    juce::NormalisableRange<float> gainRange (0.0f, 1.0f);
+    treeState.createAndAddParameter(GAIN_ID, GAIN_NAME, GAIN_NAME, gainRange, 0.5, nullptr, nullptr);
+     */
 }
 
 FuzzPedalAudioProcessor::~FuzzPedalAudioProcessor()
@@ -129,6 +134,18 @@ bool FuzzPedalAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts
 }
 #endif
 
+double applyFuzz(double input, double threshold)
+{
+    // apply fuzz effect
+    double output = input * input;
+    output *= 2.0;
+    if (output > 1.0)
+    {
+        output = 1.0;
+    }
+    return output;
+}
+
 void FuzzPedalAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
@@ -159,7 +176,50 @@ void FuzzPedalAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
         // ..do something to the data...
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
         {
-            channelData[sample] = buffer.getSample(channel, sample) * rawVolume;
+            auto input = channelData[sample];
+            auto cleanOut = channelData[sample];
+            
+            if (input > rawVolume)
+            {
+            input = input;
+            }
+            else
+            {
+            input = 0;
+            }
+            
+            /*
+            if (input > rawVolume)
+            {
+                input = rawVolume;
+            }
+            else if (input < -rawVolume)
+            {
+                input = -rawVolume;
+            }
+            else
+            {
+                input = input;
+            }
+             */
+            
+            channelData[sample] = ((0.1) * cleanOut) + (0.9f * input);
+            
+            //channelData[sample] = buffer.getSample(channel, sample) * rawVolume;
+            //channelData[sample] = applyFuzz(buffer.getSample(channel, sample), rawVolume);
+            /*
+                if (input > rawVolume)
+                {
+                    input = 1.0f - expf(-input);
+                }
+                else
+                {
+                    input = -1.0f + expf(input);
+                }
+                
+                channelData[sample] = ((1 - 0.5f) * cleanOut) + (0.5f * input);
+            */
+            
         }
     }
 }
