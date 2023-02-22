@@ -34,7 +34,9 @@ private:
     FuzzPedalAudioProcessor& audioProcessor;
     
     juce::Slider gainSlider;
-    
+    juce::Label gainLabel;
+    juce::Slider mixSlider;
+    juce::Label mixLabel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FuzzPedalAudioProcessorEditor)
 };

@@ -15,16 +15,25 @@ FuzzPedalAudioProcessorEditor::FuzzPedalAudioProcessorEditor (FuzzPedalAudioProc
 {
     // Make sure that before the constructor has finished, you've set the
     // editor's size to whatever you need it to be.
-    setSize (200, 400);
+    setSize (300, 400);
     
     gainSlider.setSliderStyle(juce::Slider::Slider::LinearVertical);
-    gainSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, true, 100, 25);
+    gainSlider.setTextBoxStyle(juce::Slider::TextBoxAbove, true, 100, 25);
     gainSlider.addListener(this);
-    
     gainSlider.setRange(0.0f, 0.065f);
     gainSlider.setValue(0.01);
-    
     addAndMakeVisible(gainSlider);
+    gainLabel.setText("Threshold", juce::dontSendNotification);
+    gainLabel.attachToComponent(&gainSlider, false);
+    
+    mixSlider.setSliderStyle(juce::Slider::Slider::LinearVertical);
+    mixSlider.setTextBoxStyle(juce::Slider::TextBoxAbove, true, 100, 25);
+    mixSlider.addListener(this);
+    mixSlider.setRange(0.0f, 1.0f);
+    mixSlider.setValue(0.5f);
+    addAndMakeVisible(mixSlider);
+    mixLabel.setText("Wet/Dry Ratio", juce::dontSendNotification);
+    mixLabel.attachToComponent(&mixSlider, false);
     
     //sliderAttach = new juce::AudioProcessorValueTreeState::SliderAttachment(audioProcessor.treeState, GAIN_ID, gainSlider);
 }
@@ -48,7 +57,8 @@ void FuzzPedalAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
-    gainSlider.setBounds(getLocalBounds());
+    gainSlider.setBounds(40, 50, 100, 325);
+    mixSlider.setBounds(165, 50, 100, 325);
 }
 
 void FuzzPedalAudioProcessorEditor::sliderValueChanged(juce::Slider *slider)
@@ -58,5 +68,8 @@ void FuzzPedalAudioProcessorEditor::sliderValueChanged(juce::Slider *slider)
         // log scale for vol changes
         //audioProcessor.rawVolume = pow(10, gainSlider.getValue() / 20);
         audioProcessor.rawVolume = gainSlider.getValue();
+    } else if (slider == &mixSlider)
+    {
+        audioProcessor.mixRatio = mixSlider.getValue();
     }
 }

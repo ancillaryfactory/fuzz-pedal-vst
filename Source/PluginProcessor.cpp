@@ -134,6 +134,7 @@ bool FuzzPedalAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts
 }
 #endif
 
+/*
 double applyFuzz(double input, double threshold)
 {
     // apply fuzz effect
@@ -145,6 +146,7 @@ double applyFuzz(double input, double threshold)
     }
     return output;
 }
+*/
 
 void FuzzPedalAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
@@ -181,11 +183,11 @@ void FuzzPedalAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
             
             if (input > rawVolume)
             {
-            input = input;
+                input = input;
             }
             else
             {
-            input = 0;
+                input = 0;
             }
             
             /*
@@ -203,7 +205,7 @@ void FuzzPedalAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
             }
              */
             
-            channelData[sample] = ((0.1) * cleanOut) + (0.9f * input);
+            channelData[sample] = ((1 - mixRatio) * cleanOut) + (mixRatio * input);
             
             //channelData[sample] = buffer.getSample(channel, sample) * rawVolume;
             //channelData[sample] = applyFuzz(buffer.getSample(channel, sample), rawVolume);

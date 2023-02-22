@@ -59,6 +59,7 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
     
     double rawVolume;
+    double mixRatio;
     //juce::AudioProcessorValueTreeState treeState;
 
 private:
