@@ -23,10 +23,7 @@ FuzzPedalAudioProcessor::FuzzPedalAudioProcessor()
 
 #endif
 {
-    /*
-    juce::NormalisableRange<float> gainRange (0.0f, 1.0f);
-    treeState.createAndAddParameter(GAIN_ID, GAIN_NAME, GAIN_NAME, gainRange, 0.5, nullptr, nullptr);
-     */
+    
 }
 
 FuzzPedalAudioProcessor::~FuzzPedalAudioProcessor()
@@ -246,12 +243,27 @@ void FuzzPedalAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
     // as intermediaries to make it easy to save and load complex data.
+    
+    // https://docs.juce.com/master/tutorial_audio_processor_value_tree_state.html
+    
+    auto state = apvts.copyState();
+    std::unique_ptr<juce::XmlElement> xml(state.createXml());
+    copyXmlToBinary(*xml, destData);
 }
 
 void FuzzPedalAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+    std::unique_ptr<juce::XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+    
+    if (xmlState.get() != nullptr)
+    {
+        if (xmlState->hasTagName(apvts.state.getType()))
+        {
+            apvts.replaceState(juce::ValueTree::fromXml(*xmlState));
+        }
+    }
 }
 
 //==============================================================================
