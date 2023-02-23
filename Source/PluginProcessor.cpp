@@ -181,7 +181,10 @@ void FuzzPedalAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
             auto input = channelData[sample];
             auto cleanOut = channelData[sample];
             
-            if (input > rawVolume)
+            auto threshold = apvts.getRawParameterValue("THRESHOLD");
+            auto mixRatio = apvts.getRawParameterValue("MIX_RATIO");
+            
+            if (input > threshold->load())
             {
                 input = input;
             }
@@ -205,7 +208,7 @@ void FuzzPedalAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
             }
              */
             
-            channelData[sample] = ((1 - mixRatio) * cleanOut) + (mixRatio * input);
+            channelData[sample] = ((1 - mixRatio->load()) * cleanOut) + (mixRatio->load() * input);
             
             //channelData[sample] = buffer.getSample(channel, sample) * rawVolume;
             //channelData[sample] = applyFuzz(buffer.getSample(channel, sample), rawVolume);
