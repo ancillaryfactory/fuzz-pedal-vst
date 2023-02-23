@@ -19,8 +19,8 @@ FuzzPedalAudioProcessor::FuzzPedalAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
-                  // treeState(*this, nullptr)
+                       ), apvts(*this, nullptr, "Parameters", createParameters())
+
 #endif
 {
     /*
@@ -256,4 +256,14 @@ void FuzzPedalAudioProcessor::setStateInformation (const void* data, int sizeInB
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new FuzzPedalAudioProcessor();
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout FuzzPedalAudioProcessor::createParameters()
+{
+    std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
+    
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("THRESHOLD", "Threshold", 0.0f, 0.065f, 0.01f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("MIX_RATIO", "Mix Ratio", 0.0f, 1.0f, 0.5f));
+    
+    return {params.begin(), params.end()};
 }

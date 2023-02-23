@@ -31,12 +31,16 @@ public:
 private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
-    FuzzPedalAudioProcessor& audioProcessor;
     
     juce::Slider gainSlider;
     juce::Label gainLabel;
     juce::Slider mixSlider;
     juce::Label mixLabel;
+    
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> gainSliderAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mixSliderAttachment;
+    
+    FuzzPedalAudioProcessor& audioProcessor;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FuzzPedalAudioProcessorEditor)
 };

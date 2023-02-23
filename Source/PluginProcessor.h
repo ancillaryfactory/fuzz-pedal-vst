@@ -60,10 +60,13 @@ public:
     
     double rawVolume;
     double mixRatio;
-    //juce::AudioProcessorValueTreeState treeState;
+    
+    juce::AudioProcessorValueTreeState apvts;
 
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FuzzPedalAudioProcessor);
+    
+    juce::AudioProcessorValueTreeState::ParameterLayout createParameters();
     
 };

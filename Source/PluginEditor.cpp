@@ -20,22 +20,24 @@ FuzzPedalAudioProcessorEditor::FuzzPedalAudioProcessorEditor (FuzzPedalAudioProc
     gainSlider.setSliderStyle(juce::Slider::Slider::LinearVertical);
     gainSlider.setTextBoxStyle(juce::Slider::TextBoxAbove, true, 100, 25);
     gainSlider.addListener(this);
-    gainSlider.setRange(0.0f, 0.065f);
-    gainSlider.setValue(0.01);
+    //gainSlider.setRange(0.0f, 0.065f);
+    //gainSlider.setValue(0.01);
     addAndMakeVisible(gainSlider);
     gainLabel.setText("Threshold", juce::dontSendNotification);
     gainLabel.attachToComponent(&gainSlider, false);
     
+    gainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "THRESHOLD", gainSlider);
+    
     mixSlider.setSliderStyle(juce::Slider::Slider::LinearVertical);
     mixSlider.setTextBoxStyle(juce::Slider::TextBoxAbove, true, 100, 25);
     mixSlider.addListener(this);
-    mixSlider.setRange(0.0f, 1.0f);
-    mixSlider.setValue(0.5f);
+    //mixSlider.setRange(0.0f, 1.0f);
+    //mixSlider.setValue(0.5f);
     addAndMakeVisible(mixSlider);
     mixLabel.setText("Wet/Dry Ratio", juce::dontSendNotification);
     mixLabel.attachToComponent(&mixSlider, false);
     
-    //sliderAttach = new juce::AudioProcessorValueTreeState::SliderAttachment(audioProcessor.treeState, GAIN_ID, gainSlider);
+    mixSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "MIX_RATIO", mixSlider);
 }
 
 FuzzPedalAudioProcessorEditor::~FuzzPedalAudioProcessorEditor()
