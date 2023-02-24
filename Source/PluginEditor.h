@@ -37,6 +37,9 @@ private:
     juce::Slider mixSlider;
     juce::Label mixLabel;
     
+    juce::LookAndFeel_V4 gainLookAndFeel;
+    juce::LookAndFeel_V4 mixLookAndFeel;
+    
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> gainSliderAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mixSliderAttachment;
     

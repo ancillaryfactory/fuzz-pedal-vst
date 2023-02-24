@@ -17,25 +17,32 @@ FuzzPedalAudioProcessorEditor::FuzzPedalAudioProcessorEditor (FuzzPedalAudioProc
     // editor's size to whatever you need it to be.
     setSize (300, 400);
     
-    gainSlider.setSliderStyle(juce::Slider::Slider::LinearVertical);
+    gainSlider.setSliderStyle(juce::Slider::Slider::LinearBarVertical);
     gainSlider.setTextBoxStyle(juce::Slider::TextBoxAbove, true, 100, 25);
     gainSlider.addListener(this);
-    //gainSlider.setRange(0.0f, 0.065f);
-    //gainSlider.setValue(0.01);
+
     addAndMakeVisible(gainSlider);
     gainLabel.setText("Threshold", juce::dontSendNotification);
     gainLabel.attachToComponent(&gainSlider, false);
     
     gainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "THRESHOLD", gainSlider);
     
-    mixSlider.setSliderStyle(juce::Slider::Slider::LinearVertical);
+    mixSlider.setSliderStyle(juce::Slider::Slider::LinearBarVertical);
     mixSlider.setTextBoxStyle(juce::Slider::TextBoxAbove, true, 100, 25);
     mixSlider.addListener(this);
-    //mixSlider.setRange(0.0f, 1.0f);
-    //mixSlider.setValue(0.5f);
+
     addAndMakeVisible(mixSlider);
-    mixLabel.setText("Wet/Dry Ratio", juce::dontSendNotification);
+    mixLabel.setText("Clean Level", juce::dontSendNotification);
     mixLabel.attachToComponent(&mixSlider, false);
+    
+    // Styling
+    mixLookAndFeel.setColour(juce::Slider::trackColourId, juce::Colour::fromRGB(72,105,102));
+    mixLookAndFeel.setColour(juce::Slider::backgroundColourId, juce::Colour::fromRGB(59,57,53));
+    gainLookAndFeel.setColour(juce::Slider::trackColourId, juce::Colour::fromRGB(59,57,53));
+    
+    mixSlider.setLookAndFeel(&mixLookAndFeel);
+    gainSlider.setLookAndFeel(&gainLookAndFeel);
+    
     
     mixSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "MIX_RATIO", mixSlider);
 }
@@ -48,7 +55,8 @@ FuzzPedalAudioProcessorEditor::~FuzzPedalAudioProcessorEditor()
 void FuzzPedalAudioProcessorEditor::paint (juce::Graphics& g)
 {
     // (Our component is opaque, so we must completely fill the background with a solid colour)
-    g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
+    g.fillAll(juce::Colours::orangered);
+    //g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
 
     g.setColour (juce::Colours::white);
     g.setFont (15.0f);

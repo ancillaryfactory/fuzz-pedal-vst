@@ -61,7 +61,6 @@
 		5F5480AE29A2A1BC008B98FC /* PluginEditor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BA48D2B09DD7DE14ABAC044 /* PluginEditor.cpp */; };
 		60769F397F7BD7A770E5F5C3 /* include_juce_audio_formats.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9B460A5E80103D0D1613F9DF /* include_juce_audio_formats.mm */; };
 		64188FF8A8B0312B8E9E105F /* include_juce_events.mm in Sources */ = {isa = PBXBuildFile; fileRef = 89E5186D32E101B5B6B77766 /* include_juce_events.mm */; };
-		81F57F582869EA1C33C587F5 /* PluginEditor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BA48D2B09DD7DE14ABAC044 /* PluginEditor.cpp */; };
 		854C3FE1AF34FED6DB7B391B /* include_juce_audio_plugin_client_ARA.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 2AE1BB41BE246985D8242A97 /* include_juce_audio_plugin_client_ARA.cpp */; };
 		87DCDEA5F58AD6F502EE12EF /* include_juce_audio_plugin_client_VST_utils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5E57864A9B7D73392E4F31FA /* include_juce_audio_plugin_client_VST_utils.mm */; };
 		8DF31499F2CBB5E2939CFFE5 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4CD1569C26D0D77DA469E98B /* QuartzCore.framework */; };
@@ -654,7 +653,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				95D18496A331392B3FF211F7 /* PluginProcessor.cpp in Sources */,
-				81F57F582869EA1C33C587F5 /* PluginEditor.cpp in Sources */,
 				DFA659362FC378CD93AC772B /* include_juce_audio_basics.mm in Sources */,
 				58A4C2F750E58C06DC186A44 /* include_juce_audio_devices.mm in Sources */,
 				60769F397F7BD7A770E5F5C3 /* include_juce_audio_formats.mm in Sources */,
