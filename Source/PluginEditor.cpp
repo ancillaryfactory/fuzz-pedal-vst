@@ -17,34 +17,48 @@ FuzzPedalAudioProcessorEditor::FuzzPedalAudioProcessorEditor (FuzzPedalAudioProc
     // editor's size to whatever you need it to be.
     setSize (300, 400);
     
+    // Gain slider
     gainSlider.setSliderStyle(juce::Slider::Slider::LinearBarVertical);
-    gainSlider.setTextBoxStyle(juce::Slider::TextBoxAbove, true, 100, 25);
+    gainSlider.setTextBoxStyle(juce::Slider::NoTextBox, true, 100, 25);
     gainSlider.addListener(this);
 
     addAndMakeVisible(gainSlider);
-    gainLabel.setText("Threshold", juce::dontSendNotification);
+    gainLabel.setText("THRESHOLD", juce::dontSendNotification);
     gainLabel.attachToComponent(&gainSlider, false);
     
-    gainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "THRESHOLD", gainSlider);
+    gainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree, "THRESHOLD", gainSlider);
     
+    // Mix slider
     mixSlider.setSliderStyle(juce::Slider::Slider::LinearBarVertical);
-    mixSlider.setTextBoxStyle(juce::Slider::TextBoxAbove, true, 100, 25);
+    mixSlider.setTextBoxStyle(juce::Slider::NoTextBox, true, 100, 25);
     mixSlider.addListener(this);
 
     addAndMakeVisible(mixSlider);
-    mixLabel.setText("Clean Level", juce::dontSendNotification);
+    mixLabel.setText("MIX", juce::dontSendNotification);
     mixLabel.attachToComponent(&mixSlider, false);
+    
+    mixSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree, "MIX_RATIO", mixSlider);
+    
+    // Cutoff
+    cutoffSlider.setSliderStyle(juce::Slider::Slider::RotaryHorizontalVerticalDrag);
+    cutoffSlider.addListener(this);
+    cutoffSlider.setTextBoxStyle(juce::Slider::NoTextBox, true, 100, 25);
+    addAndMakeVisible(cutoffSlider);
+    
+    cutoffSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree, "CUTOFF", cutoffSlider);
     
     // Styling
     mixLookAndFeel.setColour(juce::Slider::trackColourId, juce::Colour::fromRGB(72,105,102));
     mixLookAndFeel.setColour(juce::Slider::backgroundColourId, juce::Colour::fromRGB(59,57,53));
     gainLookAndFeel.setColour(juce::Slider::trackColourId, juce::Colour::fromRGB(59,57,53));
     
+    cutoffLookAndFeel.setColour(juce::Slider::thumbColourId, juce::Colour::fromRGB(255,207,189));
+    
     mixSlider.setLookAndFeel(&mixLookAndFeel);
     gainSlider.setLookAndFeel(&gainLookAndFeel);
+    cutoffSlider.setLookAndFeel(&cutoffLookAndFeel);
     
-    
-    mixSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.apvts, "MIX_RATIO", mixSlider);
+
 }
 
 FuzzPedalAudioProcessorEditor::~FuzzPedalAudioProcessorEditor()
@@ -67,8 +81,10 @@ void FuzzPedalAudioProcessorEditor::resized()
 {
     // This is generally where you'll want to lay out the positions of any
     // subcomponents in your editor..
+    cutoffSlider.setBounds(165, 0, 100, 100);
     gainSlider.setBounds(40, 50, 100, 325);
-    mixSlider.setBounds(165, 50, 100, 325);
+    mixSlider.setBounds(165, 150, 100, 225);
+    
 }
 
 void FuzzPedalAudioProcessorEditor::sliderValueChanged(juce::Slider *slider)

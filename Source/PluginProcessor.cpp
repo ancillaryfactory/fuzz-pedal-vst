@@ -19,7 +19,8 @@ FuzzPedalAudioProcessor::FuzzPedalAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       ), apvts(*this, nullptr, "Parameters", createParameters())
+                       ), tree(*this, nullptr, "Parameters", createParameters()),
+lowPassFilter(juce::dsp::FilterDesign<float>::designFIRLowpassWindowMethod(20000.0f, 44100, 21, juce::dsp::WindowingFunction<float>::hamming))
 
 #endif
 {
@@ -95,8 +96,17 @@ void FuzzPedalAudioProcessor::changeProgramName (int index, const juce::String& 
 //==============================================================================
 void FuzzPedalAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    lastSampleRate = sampleRate;
+    
+    juce::dsp::ProcessSpec spec;
+    spec.sampleRate = sampleRate;
+    spec.maximumBlockSize = samplesPerBlock;
+    spec.numChannels = getTotalNumOutputChannels();
+    
+    lowPassFilter.reset();
+    updateFilter();
+    lowPassFilter.prepare(spec);
+    
 }
 
 void FuzzPedalAudioProcessor::releaseResources()
@@ -145,6 +155,12 @@ double applyFuzz(double input, double threshold)
 }
 */
 
+void FuzzPedalAudioProcessor::updateFilter()
+{
+    float freq = *tree.getRawParameterValue("CUTOFF");
+    *lowPassFilter.state = *juce::dsp::FilterDesign<float>::designFIRLowpassWindowMethod(freq, 44100, 21, juce::dsp::WindowingFunction<float>::hamming);
+}
+
 void FuzzPedalAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
@@ -157,6 +173,8 @@ void FuzzPedalAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
     // This is here to avoid people getting screaming feedback
     // when they first compile a plugin, but obviously you don't need to keep
     // this code if your algorithm always overwrites all the output channels.
+    juce::dsp::AudioBlock<float> block(buffer);
+    
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
@@ -171,15 +189,19 @@ void FuzzPedalAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
         auto* channelData = buffer.getWritePointer (channel);
 
         // ..do something to the data...
+        
         for (int sample = 0; sample < buffer.getNumSamples(); ++sample)
         {
+
             auto input = channelData[sample];
             auto cleanOut = channelData[sample];
-            
-            auto threshold = apvts.getRawParameterValue("THRESHOLD");
-            auto mixRatio = apvts.getRawParameterValue("MIX_RATIO");
-            
-            if (input > threshold->load() + ((float) std::rand() / RAND_MAX) / 2000 )
+
+            auto threshold = tree.getRawParameterValue("THRESHOLD");
+            auto mixRatio = tree.getRawParameterValue("MIX_RATIO");
+
+            // rand/RAND_MAX will be between 0 and 1
+            float jitter = (std::rand() / RAND_MAX) / 100;
+            if (input > threshold->load() + jitter)
             {
                 input = input;
             }
@@ -187,41 +209,15 @@ void FuzzPedalAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
             {
                 input = 0;
             }
-            
-            /*
-            if (input > rawVolume)
-            {
-                input = rawVolume;
-            }
-            else if (input < -rawVolume)
-            {
-                input = -rawVolume;
-            }
-            else
-            {
-                input = input;
-            }
-             */
-            
+
+
             channelData[sample] = ((1 - mixRatio->load()) * cleanOut) + (mixRatio->load() * input);
-            
-            //channelData[sample] = buffer.getSample(channel, sample) * rawVolume;
-            //channelData[sample] = applyFuzz(buffer.getSample(channel, sample), rawVolume);
-            /*
-                if (input > rawVolume)
-                {
-                    input = 1.0f - expf(-input);
-                }
-                else
-                {
-                    input = -1.0f + expf(input);
-                }
-                
-                channelData[sample] = ((1 - 0.5f) * cleanOut) + (0.5f * input);
-            */
-            
+
         }
-    }
+   }
+    
+    updateFilter();
+    lowPassFilter.process(juce::dsp::ProcessContextReplacing<float> (block));
 }
 
 //==============================================================================
@@ -244,7 +240,7 @@ void FuzzPedalAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
     
     // https://docs.juce.com/master/tutorial_audio_processor_value_tree_state.html
     
-    auto state = apvts.copyState();
+    auto state = tree.copyState();
     std::unique_ptr<juce::XmlElement> xml(state.createXml());
     copyXmlToBinary(*xml, destData);
 }
@@ -257,9 +253,9 @@ void FuzzPedalAudioProcessor::setStateInformation (const void* data, int sizeInB
     
     if (xmlState.get() != nullptr)
     {
-        if (xmlState->hasTagName(apvts.state.getType()))
+        if (xmlState->hasTagName(tree.state.getType()))
         {
-            apvts.replaceState(juce::ValueTree::fromXml(*xmlState));
+            tree.replaceState(juce::ValueTree::fromXml(*xmlState));
         }
     }
 }
@@ -275,8 +271,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout FuzzPedalAudioProcessor::cre
 {
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
     
-    params.push_back(std::make_unique<juce::AudioParameterFloat>("THRESHOLD", "Threshold", 0.0f, 0.065f, 0.01f));
-    params.push_back(std::make_unique<juce::AudioParameterFloat>("MIX_RATIO", "Mix Ratio", 0.0f, 1.0f, 0.5f));
+    juce::NormalisableRange<float> cutoffRange(20.0f, 6000.0f);
+    juce::NormalisableRange<float> thresholdRange(0.0f, 0.1f);
+    juce::NormalisableRange<float> mixRange(0.0f, 1.0f);
+    
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("THRESHOLD", "Threshold", thresholdRange, 0.01f));
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("MIX_RATIO", "Mix Ratio", mixRange, 0.5f));
+    
+    params.push_back(std::make_unique<juce::AudioParameterFloat>("CUTOFF", "cutoff", cutoffRange, 10000.0f));
     
     return {params.begin(), params.end()};
 }

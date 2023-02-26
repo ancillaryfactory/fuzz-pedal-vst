@@ -58,15 +58,21 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
     
+    void updateFilter();
+    
     double rawVolume;
     double mixRatio;
     
-    juce::AudioProcessorValueTreeState apvts;
+    juce::AudioProcessorValueTreeState tree;
 
 private:
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FuzzPedalAudioProcessor);
     
+    float lastSampleRate;
+    
     juce::AudioProcessorValueTreeState::ParameterLayout createParameters();
+    
+    juce::dsp::ProcessorDuplicator<juce::dsp::FIR::Filter <float>, juce::dsp::FIR::Coefficients <float>> lowPassFilter;
     
 };

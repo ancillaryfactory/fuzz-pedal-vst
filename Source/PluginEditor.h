@@ -36,12 +36,16 @@ private:
     juce::Label gainLabel;
     juce::Slider mixSlider;
     juce::Label mixLabel;
+    juce::Slider cutoffSlider;
+    juce::Label cutoffLabel;
     
     juce::LookAndFeel_V4 gainLookAndFeel;
     juce::LookAndFeel_V4 mixLookAndFeel;
+    juce::LookAndFeel_V4 cutoffLookAndFeel; 
     
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> gainSliderAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mixSliderAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> cutoffSliderAttachment;
     
     FuzzPedalAudioProcessor& audioProcessor;
 
