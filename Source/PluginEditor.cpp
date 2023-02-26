@@ -23,7 +23,7 @@ FuzzPedalAudioProcessorEditor::FuzzPedalAudioProcessorEditor (FuzzPedalAudioProc
     gainSlider.addListener(this);
 
     addAndMakeVisible(gainSlider);
-    gainLabel.setText("THRESHOLD", juce::dontSendNotification);
+    gainLabel.setText("FUZZ", juce::dontSendNotification);
     gainLabel.attachToComponent(&gainSlider, false);
     
     gainSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree, "THRESHOLD", gainSlider);
@@ -46,6 +46,12 @@ FuzzPedalAudioProcessorEditor::FuzzPedalAudioProcessorEditor (FuzzPedalAudioProc
     addAndMakeVisible(cutoffSlider);
     
     cutoffSliderAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(audioProcessor.tree, "CUTOFF", cutoffSlider);
+    
+    // Boost
+    boostToggle.setButtonText("BOOST");
+    addAndMakeVisible(boostToggle);
+    
+    boostToggleAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(audioProcessor.tree, "BOOST", boostToggle);
     
     // Styling
     mixLookAndFeel.setColour(juce::Slider::trackColourId, juce::Colour::fromRGB(72,105,102));
@@ -84,6 +90,7 @@ void FuzzPedalAudioProcessorEditor::resized()
     cutoffSlider.setBounds(165, 0, 100, 100);
     gainSlider.setBounds(40, 50, 100, 325);
     mixSlider.setBounds(165, 150, 100, 225);
+    boostToggle.setBounds(165, 100, 100, 20);
     
 }
 

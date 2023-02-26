@@ -198,16 +198,19 @@ void FuzzPedalAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
 
             auto threshold = tree.getRawParameterValue("THRESHOLD");
             auto mixRatio = tree.getRawParameterValue("MIX_RATIO");
+            auto boost = tree.getRawParameterValue("BOOST");
+            
+            float rand_num = (std::rand() / RAND_MAX);
 
             // rand/RAND_MAX will be between 0 and 1
-            float jitter = (std::rand() / RAND_MAX) / 100;
+            float jitter = rand_num / 100;
             if (input > threshold->load() + jitter)
             {
                 input = input;
             }
             else
             {
-                input = 0;
+                input = (boost->load()) ? 1 : 0;
             }
 
 
@@ -279,6 +282,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout FuzzPedalAudioProcessor::cre
     params.push_back(std::make_unique<juce::AudioParameterFloat>("MIX_RATIO", "Mix Ratio", mixRange, 0.5f));
     
     params.push_back(std::make_unique<juce::AudioParameterFloat>("CUTOFF", "cutoff", cutoffRange, 10000.0f));
+    params.push_back(std::make_unique<juce::AudioParameterBool>("BOOST", "Boost", false));
     
     return {params.begin(), params.end()};
 }

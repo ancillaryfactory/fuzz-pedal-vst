@@ -38,6 +38,7 @@ private:
     juce::Label mixLabel;
     juce::Slider cutoffSlider;
     juce::Label cutoffLabel;
+    juce::ToggleButton boostToggle;
     
     juce::LookAndFeel_V4 gainLookAndFeel;
     juce::LookAndFeel_V4 mixLookAndFeel;
@@ -46,6 +47,7 @@ private:
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> gainSliderAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> mixSliderAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> cutoffSliderAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::ButtonAttachment> boostToggleAttachment;
     
     FuzzPedalAudioProcessor& audioProcessor;
 
