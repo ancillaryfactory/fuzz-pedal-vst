@@ -104,7 +104,7 @@ void FuzzPedalAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     spec.numChannels = getTotalNumOutputChannels();
     
     lowPassFilter.reset();
-    updateFilter();
+    updateLowPassFilter();
     lowPassFilter.prepare(spec);
     
 }
@@ -155,7 +155,7 @@ double applyFuzz(double input, double threshold)
 }
 */
 
-void FuzzPedalAudioProcessor::updateFilter()
+void FuzzPedalAudioProcessor::updateLowPassFilter()
 {
     float freq = *tree.getRawParameterValue("CUTOFF");
     *lowPassFilter.state = *juce::dsp::FilterDesign<float>::designFIRLowpassWindowMethod(freq, 44100, 21, juce::dsp::WindowingFunction<float>::hamming);
@@ -219,7 +219,7 @@ void FuzzPedalAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
         }
    }
     
-    updateFilter();
+    updateLowPassFilter();
     lowPassFilter.process(juce::dsp::ProcessContextReplacing<float> (block));
 }
 
